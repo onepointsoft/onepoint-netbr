@@ -1,0 +1,12 @@
+[Unit]
+Description=Script Init Vault
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/mnt/onepoint/vault.sh
+TimeoutStartSec=0
+
+[Install]
+WantedBy=default.target
+
