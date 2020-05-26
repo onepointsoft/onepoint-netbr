@@ -9,12 +9,7 @@ OSver=$(rpm --eval %{centos_ver})
 if [ $OSver -eq 7 ] 
 then
     echo "OS Version are supported --> CentOS: " $OSver
-	preOS="unzip wget nano"
-	for os in $premiOS
-	do
-		echo "Installing OS prerequisites --> "$os
-		yum install --disableplugin=fastestmirror  -y $os
-	done
+	yum install -y wget unzip nano 
 	echo "Installing all CentOS Repositories"
    	systemctl disable firewalld
 	systemctl stop firewalld
