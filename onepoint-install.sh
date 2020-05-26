@@ -12,7 +12,7 @@ then
 	systemctl stop firewalld
     echo "OS Version are supported --> CentOS: " $OSver
 	echo "Installing all CentOS Repositories"
-	yum install -y wget unzip nano 
+	yum install -y --disableplugin=fastestmirror wget unzip nano
 	echo "Installing all CentOS Repositories"
 
 	yum install  --disableplugin=fastestmirror  -y curl http://download-ib01.fedoraproject.org/pub/epel/6/x86_64/Packages/c/curlpp-0.7.3-5.el6.x86_64.rpm
