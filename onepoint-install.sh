@@ -8,12 +8,13 @@ echo "Verifying OS Version"
 OSver=$(rpm --eval %{centos_ver})
 if [ $OSver -eq 7 ] 
 then
+   	systemctl disable firewalld
+	systemctl stop firewalld
     echo "OS Version are supported --> CentOS: " $OSver
 	echo "Installing all CentOS Repositories"
 	yum install -y -q wget unzip nano 
 	echo "Installing all CentOS Repositories"
-   	systemctl disable firewalld
-	systemctl stop firewalld
+
 	yum install  --disableplugin=fastestmirror  -y curl http://download-ib01.fedoraproject.org/pub/epel/6/x86_64/Packages/c/curlpp-0.7.3-5.el6.x86_64.rpm
 	rep="https://rpms.remirepo.net/enterprise/remi-release-7.rpm \
 	http://repo.onepoint.net.br/yum/centos/repo/onepoint-repo-0.1-1centos.noarch.rpm"
