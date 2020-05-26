@@ -19,7 +19,7 @@ then
    	systemctl disable firewalld
 	systemctl stop firewalld
 	yum install  --disableplugin=fastestmirror  -y curl http://download-ib01.fedoraproject.org/pub/epel/6/x86_64/Packages/c/curlpp-0.7.3-5.el6.x86_64.rpm
-	rep="epel-release \
+	rep="wget nano unzip epel-release \
 	https://rpms.remirepo.net/enterprise/remi-release-7.rpm \
 	http://repo.onepoint.net.br/yum/centos/repo/onepoint-repo-0.1-1centos.noarch.rpm"
 	wget http://repo.onepoint.net.br/yum/centos/repo/onepoint-repo-0.1-1centos.noarch.rpm --no-check-certificate  --directory-prefix=/mnt/onepoint
