@@ -18,6 +18,8 @@ then
 	yum install  --disableplugin=fastestmirror  -y curl http://download-ib01.fedoraproject.org/pub/epel/6/x86_64/Packages/c/curlpp-0.7.3-5.el6.x86_64.rpm
 	rep="https://rpms.remirepo.net/enterprise/remi-release-7.rpm \
 	http://repo.onepoint.net.br/yum/centos/repo/onepoint-repo-0.1-1centos.noarch.rpm"
+	wget wget http://rpms.famillecollet.com/enterprise/remi-release-7.rpm --no-check-certificate  --directory-prefix=/mnt/onepoint
+	rpm -Uvh /mnt/onepoint/remi-release-7.rpm
 	wget http://repo.onepoint.net.br/yum/centos/repo/onepoint-repo-0.1-1centos.noarch.rpm --no-check-certificate  --directory-prefix=/mnt/onepoint
 	for centRep in $rep
 	do
