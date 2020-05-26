@@ -1,7 +1,7 @@
 
 #!/bin/bash
 
-t
+
 echo "Starting Onepoint Installation"
 echo "Verifying OS Version"
 
@@ -10,7 +10,7 @@ if [ $OSver -eq 7 ]
 then
     echo "OS Version are supported --> CentOS: " $OSver
 	preOS="unzip wget nano"
-	for os in $preOS
+	for os in $premiOS
 	do
 		echo "Installing OS prerequisites --> "$os
 		yum install --disableplugin=fastestmirror  -y $os
@@ -22,12 +22,14 @@ then
 	rep="epel-release \
 	https://rpms.remirepo.net/enterprise/remi-release-7.rpm \
 	http://repo.onepoint.net.br/yum/centos/repo/onepoint-repo-0.1-1centos.noarch.rpm"
+	wget http://repo.onepoint.net.br/yum/centos/repo/onepoint-repo-0.1-1centos.noarch.rpm --no-check-certificate  --directory-prefix=/mnt/onepoint
 	for centRep in $rep
 	do
 		echo "Installing $centRep"
 		yum install --disableplugin=fastestmirror  -y $rep
 		
-	done	
+	done
+	rpm -ivh /mnt/onepoint/onepoint*.rpm	
 	yum install --disableplugin=fastestmirror  -y pv
 		phpDep="php72-php php72-php-common php72-php-bz2 php72-php-curl php72-php-ldap php72-php-gd \
 		php72-php-gmp php72-php-imap php72-php-mbstring php72-php-mcrypt php72-php-soap \
@@ -76,7 +78,7 @@ then
 	echo "Configuring all Linux Repositories"
 	echo "Installing the Remi Repository"
 	echo "Downloading Hashicorp Vault"
-	wget https://releases.hashicorp.com/vault/1.4.1/vault_1.4.1_linux_amd64.zip --no-check-certificate --directory-prefix=/mnt/onepoint
+	wget https://releases.hashicorp.com/vault/1.4.1/vault_1.4.1_linux_amd64.zip --no-check-certificate  --directory-prefix=/mnt/onepoint
 	wgVault="/mnt/onepoint/vault_1.4.1_linux_amd64.zip"
 	echo "Unziping Hashicorp Vault"
 	if [ -f $wgVault ]
@@ -139,7 +141,7 @@ then
 		mysql -u root onepoint -e "GRANT ALL PRIVILEGES ON *.* TO 'onepoint'@'localhost';"
 		mysql -u root onepoint -e "FLUSH PRIVILEGES;"
 		systemctl restart mariadb
-		
+	
 	else
 		echo "I cant create the Database"
 		exit
@@ -156,7 +158,7 @@ then
 	then
 		echo "File vault-init exists"
 		echo "Start Unseal Process"
-		a=$(cat /mnt/onepoint/vault-init | grep Unseal | awk -F ' ' '{print $4}' | tail -n3 >> /mnt/onepoint/initv)
+		cat /mnt/onepoint/vault-init | grep Unseal | awk -F ' ' '{print $4}' | tail -n3 >> /mnt/onepoint/initv
 		for b in `cat /mnt/onepoint/initv`
 		do
 			echo "$b"
@@ -181,6 +183,7 @@ then
 	echo "Configring all Hashicorp Vault Policies"
 	echo "Enabling kv secret/ for storing credentials"
 	/opt/vault/bin/vault secrets enable -version=2 -path=secret kv
+	#/opt/vault/bin/vault secrets enable -path=secret kv
 	echo "Create secret-full policy for full access to secrets"
 	/opt/vault/bin/vault policy write secret-full policy.hcl
 	echo "Enabling auth AppRole"
@@ -190,9 +193,9 @@ then
    		token_max_ttl=30m \
    		policies="default,secret-full"
 	echo "Generating role-id file"
-	/opt/vault/bin/vault read auth/approle/role/secret-role/role-id >> role-id
+	/opt/vault/bin/vault read auth/approle/role/secret-role/role-id >> /mnt/onepoint/role-id
 	echo "Generating secret-id"
-	/opt/vault/bin/vault write -f auth/approle/role/secret-role/secret-id >> secret-id
+	/opt/vault/bin/vault write -f auth/approle/role/secret-role/secret-id >> /mnt/onepoint/secret-id
 	if [ -f 'secret-id' ]
 	then
 		echo "Creating SSH key for onepoint user"
@@ -221,16 +224,15 @@ then
 	for a in `ls /usr/share/onepoint/onepoint/resources/sql/ | sort -V`
 	do
 	echo "Registering file: " $a
-	mysql -u root onepoint -e "source /usr/share/onepoint/onepoint/resources/sql/$a"
+	mysql -u onepoint -ponepoint onepoint -e "source /usr/share/onepoint/onepoint/resources/sql/$a"
 	done
-       	echo -n "Do you want to disable SELINUX (Pre-requisite to run Onepoint) (y/n)? "
-        read answer
+    echo -n "Do you want to disable SELINUX (Pre-requisite to run Onepoint) (y/n)? "
+    read answer
         if [ "$answer" != "${answer#[Yy]}" ]
         then
             	echo "Disabling SELINUX"
 		sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
 
-		sed -i "s/'hostname' => 'localhost',/'hostname' => '127.0.0.1'/g" /usr/share/onepoint/onepoint/application/config/database.php
 		echo "SELINUX Disabled sucessfully. Its necessary to reboot the server"
 		(crontab -l 2>/dev/null; echo "@reboot bash /mnt/onepoint/vault.sh") | crontab -
 	else
@@ -240,6 +242,7 @@ then
 	echo "Access the Onepoint Wiki to know better the tool
 		http://wiki.onepoint.net.br/Onepoint_Procedures"
 	echo -n "Do you want to reboot the serve now (y/n)? "
+	read answer
         if [ "$answer" != "${answer#[Yy]}" ]
 	then
 		echo "Rebooting the server"
