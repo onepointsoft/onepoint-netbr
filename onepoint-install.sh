@@ -1,29 +1,3 @@
-
-#!/bin/bash
-
-
-echo "Starting Onepoint Installation"
-echo "Verifying OS Version"
-
-OSver=$(rpm --eval %{centos_ver})
-if [ $OSver -eq 7 ] 
-then
-   	systemctl disable firewalld
-	systemctl stop firewalld
-    echo "OS Version are supported --> CentOS: " $OSver
-	echo "Installing all CentOS Repositories"
-	yum install -y --disableplugin=fastestmirror wget unzip nano
-	echo "Installing all CentOS Repositories"
-
-	yum install  --disableplugin=fastestmirror  -y curl http://download-ib01.fedoraproject.org/pub/epel/6/x86_64/Packages/c/curlpp-0.7.3-5.el6.x86_64.rpm
-	rep="https://rpms.remirepo.net/enterprise/remi-release-7.rpm \
-	http://repo.onepoint.net.br/yum/centos/repo/onepoint-repo-0.1-1centos.noarch.rpm"
-	wget wget http://rpms.famillecollet.com/enterprise/remi-release-7.rpm --no-check-certificate  --directory-prefix=/mnt/onepoint
-	rpm -Uvh /mnt/onepoint/remi-release-7.rpm
-	wget http://repo.onepoint.net.br/yum/centos/repo/onepoint-repo-0.1-1centos.noarch.rpm --no-check-certificate  --directory-prefix=/mnt/onepoint
-	for centRep in $rep
-	do
-		echo "Installing $centRep"
 		yum install --disableplugin=fastestmirror  -y $rep
 		
 	done
@@ -197,11 +171,18 @@ then
 	/opt/vault/bin/vault write -f auth/approle/role/secret-role/secret-id >> /mnt/onepoint/secret-id
 	if [ -f 'secret-id' ]
 	then
-		echo "Creating SSH key for onepoint user"
-		useradd onepoint
-		printf "onepoint@2020\nonepoint@2020" | sudo passwd onepoint
-		mkdir /home/onepoint
-		chown -Rv onepoint:onepoint /home/onepoint
+	echo "Creating SSH key for onepoint user"
+	useradd onepoint
+    printf "pointone@2020\npointone@2020\n" | sudo passwd onepoint
+	mkdir /home/onepoint
+	chown -Rv onepoint:onepoint /home/onepoint
+    echo "Creating SSH Key"
+    sudo -u onepoint  ssh-keygen -t rsa  -m PEM -f /home/onepoint/.ssh/id_rsa -q -N ""
+	sleep 3
+	echo "SSH Copy ID"
+	sleep 3
+    sudo -u onepoint  sshpass -p "pointone@2020" ssh-copy-id -i /home/onepoint/.ssh/id_rsa.pub  -o StrictHostKeyChecking=no localhost
+    passwd -d onepoint
 	else
 		echo "User onepoint not found"
 	fi
@@ -255,6 +236,3 @@ else
 	echo "OS Version are not supported --> CentOS: " $OSver
 	exit
 fi
-
-
-
