@@ -246,7 +246,7 @@ then
 	onpVersion=$(ls /usr/share/onepoint/onepoint/resources/sql/ | sort -V | tail -n1 | awk -F _ '{print $4}' | awk -F .sql '{print $1}')
 	echo "Onepoint Version --> " $onpVersion
 	mysql -u onepoint -ponepoint onepoint -e "UPDATE property SET value = '$onpVersion' WHERE name = 'system.db.version'"
-	echo "To access the Onepoint Service, please access the URL: http://<IP>/onepoint/ui/setup"
+	echo "To access the Onepoint Service, please access the URL: http://<IP>/onepoint/"
 	echo "Access the Onepoint Wiki to know better the tool
 		http://wiki.onepoint.net.br/Onepoint_Procedures"
 	echo -n "Do you want to reboot the server now (Pre-requisite to run Onepoint) (y/n)? "
