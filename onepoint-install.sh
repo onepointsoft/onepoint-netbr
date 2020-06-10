@@ -31,7 +31,7 @@ then
 		phpDep="php72-php php72-php-common php72-php-bz2 php72-php-curl php72-php-ldap php72-php-gd \
 		php72-php-gmp php72-php-imap php72-php-mbstring php72-php-mcrypt php72-php-soap \
 		php72-php-mysqlnd php72-php-xml php72-php-zip php72-php-json \
-		python-pip python-requests python-ldap python-paramiko libssh json-c jsoncpp psutils psmisc telnet ssh samba"
+		python-pip python-requests python-ldap python-paramiko python2-pymssql libssh json-c jsoncpp psutils psmisc telnet ssh samba"
       	echo "Installing Onepoint Dependencies"
 
 	for php in $phpDep
